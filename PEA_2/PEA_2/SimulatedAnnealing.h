@@ -8,20 +8,21 @@ private:
 	int cost;
 	int * path;
 	int * tmpPath;
-	float temperature;
-	int * bestSolution;
+	double temperature = 10000.0;
 public:
-	float cool;
+	double cool = 0.9999;
+	int * bestSolution;
+	void randomSwap();
 	SimulatedAnnealing(int size);
 	~SimulatedAnnealing();
 	void copyArray(int *from, int *to);
 	void printResult(int *path);
 	int sumCosts(int *path, int **costs);
 	int * randomPath(int * vertices);
-	float acceptanceProb(int oldSolutionCost, int newSolutionCost, float temp);
-	void cooling(float coolingRate);
+	double acceptanceProb(int oldSolutionCost, int newSolutionCost, double temp);
+	void cooling(double coolingRate);
 	void swapValues(int &first, int &second);
-	float getTemperature(int * vertices, int **costs);
+	double getTemperature(int * vertices, int **costs);
 	void execute(int * vertices, int **costs);
 };
 

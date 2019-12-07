@@ -17,7 +17,7 @@ int main()
 	char choice;
 	Reader * reader;
 	SimulatedAnnealing * sa;
-	char name[] = "tsp_6.txt";
+	char name[] = "tsp_17.txt";
 	boolean isRead = false;					// czy graf jest wczytany
 
 	cout << "Menu:" << endl;
@@ -49,8 +49,9 @@ int main()
 			}
 			else {
 				sa = new SimulatedAnnealing(reader->elementsNumber);
-				sa->cooling(sa->cool);
+				//sa->cooling(0.95);
 				sa->execute(reader->vertices, reader->tab);
+				sa->printResult(sa->bestSolution);
 			}
 			break;
 		case '0':

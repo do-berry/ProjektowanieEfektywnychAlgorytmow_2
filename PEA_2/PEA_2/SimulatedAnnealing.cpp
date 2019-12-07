@@ -3,20 +3,30 @@
 #include <cstdlib>
 #include <stdio.h>
 #include <math.h>
+#include <cmath>
+
+#define M_E 2.71828182845904523536
 
 using namespace std;
 
 SimulatedAnnealing::SimulatedAnnealing(int size) {
 	this->size = size;
-	this->cool = 0.999;
 	// tworzenie tablic
 	this->path = new int[size];
 	this->tmpPath = new int[size];
 	this->bestSolution = new int[size];
+	for (int i = 0; i < size; i++) {
+		path[i] = i;
+	}
+	for (int i = 0; i < size; i++) {
+		bestSolution[i] = i;
+	}
 }
 
 SimulatedAnnealing::~SimulatedAnnealing() {
 	delete[]path;
+	delete[]bestSolution;
+	delete path, tmpPath;
 }
 
 /*
@@ -57,7 +67,7 @@ int SimulatedAnnealing::sumCosts(int *path, int **costs) {
 	wypisanie wyniku
 */
 void SimulatedAnnealing::printResult(int *path) {
-	cout << "Koszt: " << size << ", sciezka: ";
+	cout << "Koszt: " << cost << ", sciezka: ";
 	for (int i = 0; i < size; i++)
 	{
 		cout << path[i] << "->";
@@ -100,27 +110,39 @@ int * SimulatedAnnealing::randomPath(int * vertices) {
 	prawdopodobiestwo wyboru gorszej propozycji jest tym mniejsze
 	im roznica miedzy proponowanym a starym rozwiazaniem jest wieksza
 */
-float SimulatedAnnealing::acceptanceProb(int oldSolutionCost, int newSolutionCost, float temp) {
-	if (newSolutionCost < oldSolutionCost) {
+double SimulatedAnnealing::acceptanceProb(int newSolutionCost, int oldSolutionCost, double temp) {
+	/*if (newSolutionCost < oldSolutionCost) {
 		return 1.0;
 	}
-	return exp(-(newSolutionCost - oldSolutionCost) / temp);
+	return exp(-(newSolutionCost - oldSolutionCost) / temp);*/
+	double result = -((newSolutionCost - oldSolutionCost) / temp);
+	return pow(M_E, result);
 }
 
 /*
 	ustawienie chlodzenia
 	chlodzenie: wspolczynnik alfa podawany przy starcie
 */
-void SimulatedAnnealing::cooling(float coolingRate) {
+void SimulatedAnnealing::cooling(double coolingRate) {
 	if (cool > 0 && cool < 1) {
 		cool = coolingRate;
 	}
 }
 
+void SimulatedAnnealing::randomSwap() {
+	int a = rand() % size;
+	int b = rand() % size;
+	while (a == b) {
+		b = rand() % size;
+	}
+
+	swapValues(path[a], path[b]);
+}
+
 /*
 	obliczanie temperatury poczatkowej na podstawie roznicy drog
 */
-float SimulatedAnnealing::getTemperature(int * vertices, int **costs) {
+double SimulatedAnnealing::getTemperature(int * vertices, int **costs) {
 	path = randomPath(vertices);
 	int newCost = sumCosts(path, costs);
 	int min = newCost, max = newCost;
@@ -145,36 +167,31 @@ float SimulatedAnnealing::getTemperature(int * vertices, int **costs) {
 	}
 
 	delta = max - min;
-	return -(delta) / log(cool);
+	return (-(delta) / log(cool));
 }
 
 void SimulatedAnnealing::execute(int * vertices, int **costs) {
-	temperature = getTemperature(vertices, costs); // poczatkowa temperatura
-	path = randomPath(vertices);  // droga poczatkowa
-	bestSolution = randomPath(vertices);
+	int x = (int)pow((double)size, (double)2) / 4;
+	// temperature = getTemperature(vertices, costs); // poczatkowa temperatura
+	//copyArray(vertices, path);
+	// printResult(path);
+	// path = randomPath(vertices);  // droga poczatkowa
+	//bestSolution = randomPath(vertices);
+	//copyArray(path, bestSolution);
 
-	copyArray(path, bestSolution);
-	int cost = sumCosts(bestSolution, costs); //  obliczenie kosztu aktualnego rozwiazania
+	cost = sumCosts(path, costs); //  obliczenie kosztu aktualnego rozwiazania
 
 	while (temperature > 0.0001) {
-		int x1, x2;
+		for (int i = 0; i < x; i++) {
+			// losowa zamiana
+			randomSwap();
+			int tmpCost = sumCosts(path, costs);
+			// double chance = ((double)rand() / (RAND_MAX));
 
-		do {
-			x1 = rand() % (size - 1);
-			x2 = rand() % (size - 1);
-		} while (x1 == x2);
-
-		swap(path[x1], path[x2]);
-
-		int tmpCost = sumCosts(path, costs);
-		float chance = rand() / RAND_MAX;
-
-		if (acceptanceProb(cost, tmpCost, temperature) > chance) {
-			copyArray(path, bestSolution);
-			cost = sumCosts(bestSolution, costs);
-		}
-		else {
-			copyArray(bestSolution, path);
+			if (tmpCost < cost || acceptanceProb(tmpCost, cost, temperature) > ((double)rand() / (double)RAND_MAX)) {
+				copyArray(path, bestSolution);
+				cost = tmpCost;
+			}
 		}
 		temperature *= cool;
 	}
