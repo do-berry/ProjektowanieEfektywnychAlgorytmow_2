@@ -2,15 +2,21 @@
 #include <climits>
 #include <windows.h>
 #include "Reader.h"
+#include "SimulatedAnnealing.h"
 #include <chrono> 
-using namespace std::chrono;
+#include <cstdlib>
+#include <ctime>
 
+using namespace std::chrono;
 using namespace std;
 
 int main()
 {
+	srand(time(NULL));
+
 	char choice;
 	Reader * reader;
+	SimulatedAnnealing * sa;
 	char name[] = "tsp_6.txt";
 	boolean isRead = false;					// czy graf jest wczytany
 
@@ -42,7 +48,9 @@ int main()
 				cout << "Graf nie zostal wczytany." << endl;
 			}
 			else {
-				// TODO
+				sa = new SimulatedAnnealing(reader->elementsNumber);
+				sa->cooling(sa->cool);
+				sa->execute(reader->vertices, reader->tab);
 			}
 			break;
 		case '0':
