@@ -5,7 +5,9 @@ class SimulatedAnnealing {
 private:
 	int size;
 	int delta;
+	int cost;
 	int * path;
+	int * tmpPath;
 	float temperature;
 	int * bestSolution;
 public:

@@ -11,6 +11,7 @@ SimulatedAnnealing::SimulatedAnnealing(int size) {
 	this->cool = 0.999;
 	// tworzenie tablic
 	this->path = new int[size];
+	this->tmpPath = new int[size];
 	this->bestSolution = new int[size];
 }
 
@@ -120,7 +121,7 @@ void SimulatedAnnealing::cooling(float coolingRate) {
 	obliczanie temperatury poczatkowej na podstawie roznicy drog
 */
 float SimulatedAnnealing::getTemperature(int * vertices, int **costs) {
-	copyArray(randomPath(vertices), path);
+	path = randomPath(vertices);
 	int newCost = sumCosts(path, costs);
 	int min = newCost, max = newCost;
 
@@ -149,9 +150,11 @@ float SimulatedAnnealing::getTemperature(int * vertices, int **costs) {
 
 void SimulatedAnnealing::execute(int * vertices, int **costs) {
 	temperature = getTemperature(vertices, costs); // poczatkowa temperatura
-	copyArray(randomPath(vertices), path); // droga poczatkowa
+	path = randomPath(vertices);  // droga poczatkowa
+	bestSolution = randomPath(vertices);
+
 	copyArray(path, bestSolution);
-	int cost = sumCosts(bestSolution, costs); // obliczenie kosztu aktualnego rozwiazania
+	int cost = sumCosts(bestSolution, costs); //  obliczenie kosztu aktualnego rozwiazania
 
 	while (temperature > 0.0001) {
 		int x1, x2;
@@ -175,11 +178,4 @@ void SimulatedAnnealing::execute(int * vertices, int **costs) {
 		}
 		temperature *= cool;
 	}
-
-	cout << "Solution:" << endl;
-	for (int i = 0; i < size; i++)
-	{
-		cout << bestSolution[i] << "->";
-	}
-	cout << bestSolution[0] << endl;
 }
