@@ -48,10 +48,8 @@ int main()
 				cout << "Graf nie zostal wczytany." << endl;
 			}
 			else {
-				sa = new SimulatedAnnealing(reader->elementsNumber);
-				//sa->cooling(0.95);
+				sa = new SimulatedAnnealing(reader->elementsNumber);;
 				sa->execute(reader->vertices, reader->tab);
-				sa->printResult(sa->bestSolution);
 			}
 			break;
 		case '0':
@@ -61,6 +59,6 @@ int main()
 		}
 	} while (choice != '0');
 
-	delete reader;
+	delete reader, sa;
     return 0;
 }
