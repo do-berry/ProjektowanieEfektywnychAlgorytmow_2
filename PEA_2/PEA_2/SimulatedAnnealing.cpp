@@ -36,7 +36,7 @@ void SimulatedAnnealing::copyArray(int *from, int *to)
 {
 	for (int i = 0; i < size; i++)
 	{
-		from[i] = to[i];
+		to[i] = from[i];
 	}
 }
 
@@ -79,8 +79,8 @@ void SimulatedAnnealing::printResult(int *path) {
 	prawdopodobienstwo akceptacji:
 	rozwazanie z jakim prawdopodobienstwem rozwiazanie nowe jest gorsze od starego
 */
-double SimulatedAnnealing::acceptanceProb(int newSolutionCost, int oldSolutionCost, double temp) {
-	double result = -((newSolutionCost - oldSolutionCost) / temp);
+double SimulatedAnnealing::acceptanceProb(int newSolutionCost, int oldSolutionCost) {
+	double result = -((newSolutionCost - oldSolutionCost) / temperature);
 	return pow(M_E, result);
 }
 
@@ -101,7 +101,7 @@ void SimulatedAnnealing::randomSwap() {
 	glowny algorytm
 */
 void SimulatedAnnealing::execute(int * vertices, int **costs) {
-	int iterations = (int)pow((double)size, (double)2) / 4; // liczba iteracji: n^2/4
+	int iterations = (int)pow(size, 2) / 4; // liczba iteracji: n^2/4
 	cost = sumCosts(path, costs); //  obliczenie kosztu aktualnego rozwiazania
 
 	while (temperature > 0.0001) {
@@ -113,7 +113,7 @@ void SimulatedAnnealing::execute(int * vertices, int **costs) {
 			// przymujemy znalezione rozwiazanie jesli koszt jest mniejszy od aktualnie najmniejszego 
 			// lub prawdopodobienstwo akceptacji gorszego rozwiazania jest wieksze
 			// ma to na celu unikniecie minimum lokalnego
-			if (tmpCost < cost || acceptanceProb(tmpCost, cost, temperature) > ((double)rand() / (double)RAND_MAX)) {
+			if (tmpCost < cost || (acceptanceProb(tmpCost, cost) > ((double)rand() / (double)RAND_MAX))) {
 				copyArray(path, bestSolution);
 				cost = tmpCost;
 			}
@@ -123,5 +123,5 @@ void SimulatedAnnealing::execute(int * vertices, int **costs) {
 		temperature *= cooling;
 	}
 
-	printResult(bestSolution);
+	//printResult(bestSolution);
 }

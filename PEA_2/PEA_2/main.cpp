@@ -17,7 +17,7 @@ int main()
 	char choice;
 	Reader * reader;
 	SimulatedAnnealing * sa;
-	char name[] = "tsp_17.txt";
+	char name[] = "ftv70.txt";
 	boolean isRead = false;					// czy graf jest wczytany
 
 	cout << "Menu:" << endl;
@@ -49,7 +49,12 @@ int main()
 			}
 			else {
 				sa = new SimulatedAnnealing(reader->elementsNumber);;
+				//auto start = high_resolution_clock::now();
 				sa->execute(reader->vertices, reader->tab);
+				//auto stop = high_resolution_clock::now();
+				//auto duration = duration_cast<milliseconds>(stop - start);
+				//cout << duration.count() << endl;
+				sa->printResult(sa->bestSolution);
 			}
 			break;
 		case '0':
